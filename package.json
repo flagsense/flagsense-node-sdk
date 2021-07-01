@@ -1,0 +1,29 @@
+{
+	"name": "flagsense-node-sdk",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/flagsense/flagsense-node-sdk.git"
+	},
+	"author": "flagsense",
+	"license": "Apache-2.0",
+	"bugs": {
+		"url": "https://github.com/flagsense/flagsense-node-sdk/issues"
+	},
+	"homepage": "https://www.flagsense.com",
+	"dependencies": {
+		"async-exit-hook": "^2.0.1",
+		"compare-versions": "3.6.0",
+		"lodash.clonedeep": "^4.5.0",
+		"murmurhash": "2.0.0",
+		"node-cache": "5.1.2",
+		"request": "2.88.2",
+		"requestretry": "5.0.0",
+		"uuid": "^8.3.2"
+	}
+}
