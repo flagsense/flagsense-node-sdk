@@ -63,7 +63,7 @@ class Flagsense {
 	}
 
 	fetchLatest() {
-		console.log("fetching data at: " + new Date());
+		// console.log("fetching data at: " + new Date());
 
 		let body = {
 			environment: this.environment,

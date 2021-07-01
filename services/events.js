@@ -154,8 +154,8 @@ class Events {
 
 	asyncPostRequest(api, requestBody) {
 		return new Promise((resolve, reject) => {
-			console.log("sending events at: " + new Date());
-			console.log(JSON.stringify(requestBody));
+			// console.log("sending events at: " + new Date());
+			// console.log(JSON.stringify(requestBody));
 			this.postRequest(api, requestBody, (err, res) => {
 				if (err)
 					console.log(err);
