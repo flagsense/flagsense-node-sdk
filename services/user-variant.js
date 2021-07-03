@@ -2,7 +2,7 @@ const murmurhash = require('murmurhash');
 const compareVersions = require('compare-versions');
 const Utility = require('../util/utility');
 const Constants = require('../util/constants');
-const ExptCustError = require('../util/exptCustError');
+const FlagsenseError = require('../util/flagsense-error');
 
 class UserVariant {
 	constructor(data) {
@@ -11,14 +11,14 @@ class UserVariant {
 
 	evaluate(userId, attributes, flagId) {
 		if (!flagId || !userId)
-			throw new ExptCustError("Bad Request");
+			throw new FlagsenseError("Bad Request");
 
 		if (!attributes)
 			attributes = {};
 
 		const flag = this.data.flags[flagId];
 		if (!flag)
-			throw new ExptCustError("Flag not found");
+			throw new FlagsenseError("Flag not found");
 
 		const userVariantKey = this.getUserVariantKey(userId, attributes, flag);
 		return {

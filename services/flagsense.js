@@ -1,15 +1,15 @@
 const request = require('requestretry');
 const Utility = require('../util/utility');
 const Constants = require('../util/constants');
-const ExptCustError = require('../util/exptCustError');
+const FlagsenseError = require('../util/flagsense-error');
 const FSVariation = require('../model/FSVariation');
-const UserVariant = require('./userVariant');
+const UserVariant = require('./user-variant');
 const Events = require("./events");
 
 class Flagsense {
 	constructor(sdkId, sdkSecret, environment) {
 		if (!sdkId || !sdkSecret)
-			throw new ExptCustError('Empty sdk params not allowed');
+			throw new FlagsenseError('Empty sdk params not allowed');
 
 		this.lastUpdatedOn = 0;
 		this.environment = environment;
@@ -49,7 +49,7 @@ class Flagsense {
 	getVariant(flagId, userId, attributes, defaultVariant) {
 		try {
 			if (this.lastUpdatedOn === 0)
-				throw new ExptCustError('Loading data');
+				throw new FlagsenseError('Loading data');
 			const variant = this.userVariant.evaluate(userId.toString(), attributes, flagId);
 			this.events.addEvaluationCount(flagId, variant.key);
 			return variant;
