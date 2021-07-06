@@ -38,6 +38,11 @@ class Flagsense {
 		return this.lastUpdatedOn > 0;
 	}
 
+	// Returns a promise which is resolved after the initialization is complete
+	waitForInitializationComplete() {
+		return Utility.waitFor(this.initializationComplete.bind(this));
+	}
+
 	getVariation(fsFlag, fsUser) {
 		const variant = this.getVariant(fsFlag.flagId, fsUser.userId, fsUser.attributes, {
 			key: fsFlag.defaultKey,

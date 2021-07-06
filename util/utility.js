@@ -26,4 +26,14 @@ functions.invoke = function (promise) {
 		});
 }
 
+functions.waitFor = function (conditionFunction) {
+	const poll = resolve => {
+		if (conditionFunction())
+			resolve();
+		else
+			setTimeout(() => poll(resolve), 500);
+	}
+	return new Promise(poll);
+}
+
 module.exports = functions;

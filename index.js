@@ -20,4 +20,5 @@ exports.flag = function (flagId, defaultKey, defaultValue) {
 
 // Below methods can be used on instance returned from createService method
 // initializationComplete()
+// waitForInitializationComplete()
 // getVariation(fsFlag, fsUser)
