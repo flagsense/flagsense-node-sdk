@@ -190,6 +190,9 @@ class UserVariant {
 
 	matchesVersionRule(rule, attributeValue) {
 		const values = rule.values;
+		if (!compareVersions.validate(attributeValue))
+			attributeValue = '0.0';
+
 		switch (rule.operator) {
 			case 'LT':
 				return compareVersions(attributeValue, values[0]) < 0;
@@ -207,7 +210,10 @@ class UserVariant {
 				return compareVersions(attributeValue, values[0]) >= 0;
 
 			case 'IOF':
-				return values.indexOf(attributeValue) !== -1;
+				for (let value of values)
+					if (compareVersions(attributeValue, value) === 0)
+						return true;
+				return false;
 
 			default:
 				return false;

@@ -25,7 +25,7 @@ class Events {
 		if (Constants.CAPTURE_EVENTS_FLAG) {
 			setTimeout(() => {
 				this.sendEvents();
-			}, Constants.EVENT_FLUSH_INTITAL_DELAY);
+			}, Constants.EVENT_FLUSH_INITIAL_DELAY);
 		}
 
 		this.registerShutdownHook();
