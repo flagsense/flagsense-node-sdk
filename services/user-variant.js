@@ -121,13 +121,10 @@ class UserVariant {
 	}
 
 	getAttributeValue(userId, attributes, key) {
-		if (key === 'id')
-			return userId;
-
-		if (!attributes)
-			return null;
-
-		return attributes[key];
+		const attributesContainsKey = attributes && attributes.hasOwnProperty(key);
+		if (attributesContainsKey)
+			return attributes[key];
+		return key === 'id' ? userId : null;
 	}
 
 	matchesNumberRule(rule, attributeValue) {
