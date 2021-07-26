@@ -51,6 +51,11 @@ class Flagsense {
 		return new FSVariation(variant.key, variant.value);
 	}
 
+	recordCodeError(flagId, variationKey) {
+		if (flagId && variationKey)
+			this.events.addCodeBugsCount(flagId, variationKey);
+	}
+
 	getVariant(flagId, userId, attributes, defaultVariant) {
 		try {
 			if (this.lastUpdatedOn === 0)

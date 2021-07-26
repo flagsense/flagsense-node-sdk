@@ -8,6 +8,7 @@ const Utility = require('../util/utility');
 class Events {
 	constructor(headers, environment) {
 		this.data = {};
+		this.codeBugs = {};
 		this.errors = {};
 		this.requestBodyMap = {};
 		this.timeSlot = this.getTimeSlot(new Date());
@@ -18,6 +19,7 @@ class Events {
 			sdkType: 'node',
 			environment: environment,
 			data: null,
+			codeBugs: null,
 			errors: null,
 			time: this.timeSlot
 		};
@@ -73,6 +75,30 @@ class Events {
 		}
 	}
 
+	addCodeBugsCount(flagId, variantKey) {
+		try {
+			if (!Constants.CAPTURE_EVENTS_FLAG)
+				return;
+
+			const currentTimeSlot = this.getTimeSlot(new Date());
+			if (currentTimeSlot !== this.timeSlot)
+				this.checkAndRefreshData(currentTimeSlot);
+
+			if (this.codeBugs.hasOwnProperty(flagId)) {
+				if (this.codeBugs[flagId].hasOwnProperty(variantKey))
+					this.codeBugs[flagId][variantKey] = this.codeBugs[flagId][variantKey] + 1;
+				else
+					this.codeBugs[flagId][variantKey] = 1;
+			} else {
+				this.codeBugs[flagId] = {
+					[variantKey]: 1
+				};
+			}
+		}
+		catch (err) {
+		}
+	}
+
 	checkAndRefreshData(currentTimeSlot) {
 		if (currentTimeSlot === this.timeSlot)
 			return;
@@ -82,12 +108,14 @@ class Events {
 	refreshData(currentTimeSlot) {
 		this.body.time = this.timeSlot;
 		this.body.data = this.data;
+		this.body.codeBugs = this.codeBugs;
 		this.body.errors = this.errors;
 
 		this.requestBodyMap[this.timeSlot] = cloneDeep(this.body);
 
 		this.timeSlot = currentTimeSlot;
 		this.data = {};
+		this.codeBugs = {};
 		this.errors = {};
 	}
 
