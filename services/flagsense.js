@@ -23,7 +23,8 @@ class Flagsense {
 
 		this.data = {
 			segments: null,
-			flags: null
+			flags: null,
+			experiments: null
 		};
 
 		this.events = new Events(this.headers, this.environment);
@@ -51,9 +52,27 @@ class Flagsense {
 		return new FSVariation(variant.key, variant.value);
 	}
 
-	recordCodeError(flagId, variationKey) {
-		if (flagId && variationKey)
-			this.events.addCodeBugsCount(flagId, variationKey);
+	recordEvent(fsUser, experimentId, eventName, value) {
+		if (!fsUser || !experimentId || !eventName || this.lastUpdatedOn === 0)
+			return;
+		if (value === undefined)
+			value = 1;
+
+		const experiment = this.data.experiments[experimentId];
+		if (!experiment || !experiment.eventNames || experiment.eventNames.indexOf(eventName) === -1)
+			return;
+
+		const variantKey = this.getVariantKey(fsUser, experiment.flagId);
+		this.events.recordExperimentEvent(experimentId, eventName, variantKey, value);
+	}
+
+	recordCodeError(fsFlag, fsUser) {
+		if (!fsFlag || !fsUser)
+			return;
+
+		const variantKey = this.getVariantKey(fsUser, fsFlag.flagId);
+		if (fsFlag.flagId && variantKey)
+			this.events.addCodeBugsCount(fsFlag.flagId, variantKey);
 	}
 
 	getVariant(flagId, userId, attributes, defaultVariant) {
@@ -72,6 +91,17 @@ class Flagsense {
 		}
 	}
 
+	getVariantKey(fsUser, flagId) {
+		try {
+			if (this.lastUpdatedOn === 0)
+				throw new FlagsenseError('Loading data');
+			return this.userVariant.evaluate(fsUser.userId.toString(), fsUser.attributes, flagId).key;
+		}
+		catch (err) {
+			return '';
+		}
+	}
+
 	fetchLatest() {
 		// console.log("fetching data at: " + new Date());
 
@@ -87,11 +117,13 @@ class Flagsense {
 			if (err || !res)
 				return;
 
-			if (res.lastUpdatedOn && res.segments && res.flags) {
+			if (res.lastUpdatedOn && res.segments && res.flags && res.experiments) {
 				if (!Utility.isEmpty(res.segments))
 					this.data.segments = res.segments;
 				if (!Utility.isEmpty(res.flags))
 					this.data.flags = res.flags;
+				if (!Utility.isEmpty(res.experiments))
+					this.data.experiments = res.experiments;
 				this.lastUpdatedOn = res.lastUpdatedOn;
 			}
 		});

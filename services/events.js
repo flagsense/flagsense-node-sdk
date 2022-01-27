@@ -10,7 +10,9 @@ class Events {
 		this.data = {};
 		this.codeBugs = {};
 		this.errors = {};
+		this.experimentEvents = {};
 		this.requestBodyMap = {};
+		this.experimentEventsBodyMap = {};
 		this.timeSlot = this.getTimeSlot(new Date());
 
 		this.headers = headers;
@@ -22,6 +24,14 @@ class Events {
 			codeBugs: null,
 			errors: null,
 			time: this.timeSlot
+		};
+
+		this.experimentEventsBody = {
+			machineId: this.body.machineId,
+			sdkType: 'node',
+			environment: environment,
+			time: this.timeSlot,
+			experimentEvents: null
 		};
 
 		if (Constants.CAPTURE_EVENTS_FLAG) {
@@ -99,6 +109,49 @@ class Events {
 		}
 	}
 
+	recordExperimentEvent(experimentId, eventName, variantKey, value) {
+		try {
+			if (!Constants.CAPTURE_EVENTS_FLAG)
+				return;
+
+			const currentTimeSlot = this.getTimeSlot(new Date());
+			if (currentTimeSlot !== this.timeSlot)
+				this.checkAndRefreshData(currentTimeSlot);
+
+			let metricsMap = {
+				count: 1,
+				total: value,
+				minimum: value,
+				maximum: value
+			};
+
+			if (this.experimentEvents.hasOwnProperty(experimentId)) {
+				if (this.experimentEvents[experimentId].hasOwnProperty(eventName)) {
+					if (this.experimentEvents[experimentId][eventName].hasOwnProperty(variantKey)) {
+						metricsMap = this.experimentEvents[experimentId][eventName][variantKey];
+						metricsMap.count = metricsMap.count + 1;
+						metricsMap.total = metricsMap.total + value;
+						metricsMap.minimum = Math.min(metricsMap.minimum, value);
+						metricsMap.maximum = Math.max(metricsMap.maximum, value);
+					}
+					this.experimentEvents[experimentId][eventName][variantKey] = metricsMap;
+				} else {
+					this.experimentEvents[experimentId][eventName] = {
+						[variantKey]: metricsMap
+					};
+				}
+			} else {
+				this.experimentEvents[experimentId] = {
+					[eventName]: {
+						[variantKey]: metricsMap
+					}
+				};
+			}
+		}
+		catch (err) {
+		}
+	}
+
 	checkAndRefreshData(currentTimeSlot) {
 		if (currentTimeSlot === this.timeSlot)
 			return;
@@ -110,13 +163,17 @@ class Events {
 		this.body.data = this.data;
 		this.body.codeBugs = this.codeBugs;
 		this.body.errors = this.errors;
-
 		this.requestBodyMap[this.timeSlot] = cloneDeep(this.body);
+
+		this.experimentEventsBody.time = this.timeSlot;
+		this.experimentEventsBody.experimentEvents = this.experimentEvents;
+		this.experimentEventsBodyMap[this.timeSlot] = cloneDeep(this.experimentEventsBody);
 
 		this.timeSlot = currentTimeSlot;
 		this.data = {};
 		this.codeBugs = {};
 		this.errors = {};
+		this.experimentEvents = {};
 	}
 
 	// This method has been optimized for EVENT_FLUSH_INTERVAL = 5 * 60 * 1000
@@ -142,7 +199,7 @@ class Events {
 	}
 
 	getTimeSlot(date) {
-		return new Date(Math.floor(date / Constants.EVENT_FLUSH_INTERVAL) * Constants.EVENT_FLUSH_INTERVAL).getTime();
+		return new Date(Math.ceil(date / Constants.EVENT_FLUSH_INTERVAL) * Constants.EVENT_FLUSH_INTERVAL).getTime();
 	}
 
 	registerShutdownHook() {
@@ -167,6 +224,17 @@ class Events {
 				if (requestBody) {
 					asyncTasks.push(this.asyncPostRequest('variantsData', requestBody));
 					delete this.requestBodyMap[time];
+				}
+			}
+		}
+
+		const experimentEventsTimeKeys = Object.keys(this.experimentEventsBodyMap);
+		for (const time of experimentEventsTimeKeys) {
+			if (this.experimentEventsBodyMap.hasOwnProperty(time)) {
+				const requestBody = this.experimentEventsBodyMap[time];
+				if (requestBody) {
+					asyncTasks.push(this.asyncPostRequest('experimentEvents', requestBody));
+					delete this.experimentEventsBodyMap[time];
 				}
 			}
 		}
