@@ -63,6 +63,8 @@ class Flagsense {
 			return;
 
 		const variantKey = this.getVariantKey(fsUser, experiment.flagId);
+		if (variantKey === '')
+			return;
 		this.events.recordExperimentEvent(experimentId, eventName, variantKey, value);
 	}
 
