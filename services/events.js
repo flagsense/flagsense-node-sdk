@@ -109,7 +109,7 @@ class Events {
 		}
 	}
 
-	recordExperimentEvent(experimentId, eventName, variantKey, value) {
+	recordExperimentEvent(flagId, eventName, variantKey, value) {
 		try {
 			if (!Constants.CAPTURE_EVENTS_FLAG)
 				return;
@@ -125,23 +125,23 @@ class Events {
 				maximum: value
 			};
 
-			if (this.experimentEvents.hasOwnProperty(experimentId)) {
-				if (this.experimentEvents[experimentId].hasOwnProperty(eventName)) {
-					if (this.experimentEvents[experimentId][eventName].hasOwnProperty(variantKey)) {
-						metricsMap = this.experimentEvents[experimentId][eventName][variantKey];
+			if (this.experimentEvents.hasOwnProperty(flagId)) {
+				if (this.experimentEvents[flagId].hasOwnProperty(eventName)) {
+					if (this.experimentEvents[flagId][eventName].hasOwnProperty(variantKey)) {
+						metricsMap = this.experimentEvents[flagId][eventName][variantKey];
 						metricsMap.count = metricsMap.count + 1;
 						metricsMap.total = metricsMap.total + value;
 						metricsMap.minimum = Math.min(metricsMap.minimum, value);
 						metricsMap.maximum = Math.max(metricsMap.maximum, value);
 					}
-					this.experimentEvents[experimentId][eventName][variantKey] = metricsMap;
+					this.experimentEvents[flagId][eventName][variantKey] = metricsMap;
 				} else {
-					this.experimentEvents[experimentId][eventName] = {
+					this.experimentEvents[flagId][eventName] = {
 						[variantKey]: metricsMap
 					};
 				}
 			} else {
-				this.experimentEvents[experimentId] = {
+				this.experimentEvents[flagId] = {
 					[eventName]: {
 						[variantKey]: metricsMap
 					}

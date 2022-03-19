@@ -52,20 +52,20 @@ class Flagsense {
 		return new FSVariation(variant.key, variant.value);
 	}
 
-	recordEvent(fsUser, experimentId, eventName, value) {
-		if (!fsUser || !experimentId || !eventName || this.lastUpdatedOn === 0)
+	recordEvent(fsUser, flagId, eventName, value) {
+		if (!fsUser || !flagId || !eventName || this.lastUpdatedOn === 0)
 			return;
 		if (value === undefined)
 			value = 1;
 
-		const experiment = this.data.experiments[experimentId];
+		const experiment = this.data.experiments[flagId];
 		if (!experiment || !experiment.eventNames || experiment.eventNames.indexOf(eventName) === -1)
 			return;
 
-		const variantKey = this.getVariantKey(fsUser, experiment.flagId);
+		const variantKey = this.getVariantKey(fsUser, flagId);
 		if (variantKey === '')
 			return;
-		this.events.recordExperimentEvent(experimentId, eventName, variantKey, value);
+		this.events.recordExperimentEvent(flagId, eventName, variantKey, value);
 	}
 
 	recordCodeError(fsFlag, fsUser) {
