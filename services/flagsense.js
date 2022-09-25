@@ -12,6 +12,7 @@ class Flagsense {
 			throw new FlagsenseError('Empty sdk params not allowed');
 
 		this.lastUpdatedOn = 0;
+		this.maxInitializationWaitTime = Constants.MAX_INITIALIZATION_WAIT_TIME;
 		this.environment = environment;
 		if (!environment || Constants.ENVIRONMENTS.indexOf(environment) === -1)
 			this.environment = 'PROD';
@@ -20,7 +21,6 @@ class Flagsense {
 		this.headers[Constants.HEADERS.AUTH_TYPE] = 'sdk';
 		this.headers[Constants.HEADERS.SDK_ID] = sdkId;
 		this.headers[Constants.HEADERS.SDK_SECRET] = sdkSecret;
-		this.maxInitializationWaitTime = Constants.MAX_INITIALIZATION_WAIT_TIME;
 
 		this.data = {
 			segments: null,
