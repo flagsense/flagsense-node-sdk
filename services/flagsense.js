@@ -20,6 +20,7 @@ class Flagsense {
 		this.headers[Constants.HEADERS.AUTH_TYPE] = 'sdk';
 		this.headers[Constants.HEADERS.SDK_ID] = sdkId;
 		this.headers[Constants.HEADERS.SDK_SECRET] = sdkSecret;
+		this.maxInitializationWaitTime = Constants.MAX_INITIALIZATION_WAIT_TIME;
 
 		this.data = {
 			segments: null,
@@ -41,7 +42,11 @@ class Flagsense {
 
 	// Returns a promise which is resolved after the initialization is complete
 	waitForInitializationComplete() {
-		return Utility.waitFor(this.initializationComplete.bind(this));
+		return Utility.waitFor(this.initializationComplete.bind(this), this.maxInitializationWaitTime);
+	}
+
+	setMaxInitializationWaitTime(timeInMillis) {
+		this.maxInitializationWaitTime = timeInMillis;
 	}
 
 	getVariation(fsFlag, fsUser) {

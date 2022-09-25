@@ -21,7 +21,6 @@
 		"compare-versions": "3.6.0",
 		"lodash.clonedeep": "^4.5.0",
 		"murmurhash": "2.0.0",
-		"node-cache": "5.1.2",
 		"request": "2.88.2",
 		"requestretry": "5.0.0",
 		"uuid": "^8.3.2"
