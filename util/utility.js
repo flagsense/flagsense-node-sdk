@@ -26,9 +26,10 @@ functions.invoke = function (promise) {
 		});
 }
 
-functions.waitFor = function (conditionFunction) {
+functions.waitFor = function (conditionFunction, maxWaitTime) {
+	const startTime = (new Date()).getTime();
 	const poll = resolve => {
-		if (conditionFunction())
+		if (conditionFunction() || (new Date()).getTime() - startTime >= maxWaitTime)
 			resolve();
 		else
 			setTimeout(() => poll(resolve), 500);

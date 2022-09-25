@@ -12,6 +12,7 @@ class Flagsense {
 			throw new FlagsenseError('Empty sdk params not allowed');
 
 		this.lastUpdatedOn = 0;
+		this.maxInitializationWaitTime = Constants.MAX_INITIALIZATION_WAIT_TIME;
 		this.environment = environment;
 		if (!environment || Constants.ENVIRONMENTS.indexOf(environment) === -1)
 			this.environment = 'PROD';
@@ -41,7 +42,11 @@ class Flagsense {
 
 	// Returns a promise which is resolved after the initialization is complete
 	waitForInitializationComplete() {
-		return Utility.waitFor(this.initializationComplete.bind(this));
+		return Utility.waitFor(this.initializationComplete.bind(this), this.maxInitializationWaitTime);
+	}
+
+	setMaxInitializationWaitTime(timeInMillis) {
+		this.maxInitializationWaitTime = timeInMillis;
 	}
 
 	getVariation(fsFlag, fsUser) {
@@ -52,20 +57,20 @@ class Flagsense {
 		return new FSVariation(variant.key, variant.value);
 	}
 
-	recordEvent(fsUser, experimentId, eventName, value) {
-		if (!fsUser || !experimentId || !eventName || this.lastUpdatedOn === 0)
+	recordEvent(fsUser, flagId, eventName, value) {
+		if (!fsUser || !flagId || !eventName || this.lastUpdatedOn === 0)
 			return;
 		if (value === undefined)
 			value = 1;
 
-		const experiment = this.data.experiments[experimentId];
+		const experiment = this.data.experiments[flagId];
 		if (!experiment || !experiment.eventNames || experiment.eventNames.indexOf(eventName) === -1)
 			return;
 
-		const variantKey = this.getVariantKey(fsUser, experiment.flagId);
+		const variantKey = this.getVariantKey(fsUser, flagId);
 		if (variantKey === '')
 			return;
-		this.events.recordExperimentEvent(experimentId, eventName, variantKey, value);
+		this.events.recordExperimentEvent(flagId, eventName, variantKey, value);
 	}
 
 	recordCodeError(fsFlag, fsUser) {
