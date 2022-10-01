@@ -45,6 +45,12 @@ class Flagsense {
 		return Utility.waitFor(this.initializationComplete.bind(this), this.maxInitializationWaitTime);
 	}
 
+	async waitForInitializationCompleteAsync() {
+		await Utility.invoke(
+			Utility.waitFor(this.initializationComplete.bind(this), this.maxInitializationWaitTime)
+		);
+	}
+
 	setMaxInitializationWaitTime(timeInMillis) {
 		this.maxInitializationWaitTime = timeInMillis;
 	}
