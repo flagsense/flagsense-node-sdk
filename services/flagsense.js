@@ -63,27 +63,27 @@ class Flagsense {
 		return new FSVariation(variant.key, variant.value);
 	}
 
-	recordEvent(fsUser, flagId, eventName, value) {
-		if (!fsUser || !flagId || !eventName || this.lastUpdatedOn === 0)
+	recordEvent(fsFlag, fsUser, eventName, value) {
+		if (!fsUser || !fsFlag || !fsFlag.flagId || !eventName || this.lastUpdatedOn === 0)
 			return;
 		if (value === undefined)
 			value = 1;
 
-		const experiment = this.data.experiments[flagId];
+		const experiment = this.data.experiments[fsFlag.flagId];
 		if (!experiment || !experiment.eventNames || experiment.eventNames.indexOf(eventName) === -1)
 			return;
 
-		const variantKey = this.getVariantKey(fsUser, flagId);
+		const variantKey = this.getVariantKey(fsUser, fsFlag.flagId, fsFlag.defaultKey);
 		if (variantKey === '')
 			return;
-		this.events.recordExperimentEvent(flagId, eventName, variantKey, value);
+		this.events.recordExperimentEvent(fsFlag.flagId, eventName, variantKey, value);
 	}
 
 	recordCodeError(fsFlag, fsUser) {
 		if (!fsFlag || !fsUser)
 			return;
 
-		const variantKey = this.getVariantKey(fsUser, fsFlag.flagId);
+		const variantKey = this.getVariantKey(fsUser, fsFlag.flagId, fsFlag.defaultKey);
 		if (fsFlag.flagId && variantKey)
 			this.events.addCodeBugsCount(fsFlag.flagId, variantKey);
 	}
@@ -98,20 +98,20 @@ class Flagsense {
 		}
 		catch (err) {
 			// console.error(err);
-			this.events.addEvaluationCount(flagId, (defaultVariant && defaultVariant.key) ? defaultVariant.key : "default");
+			this.events.addEvaluationCount(flagId, (defaultVariant && defaultVariant.key) ? defaultVariant.key : "FS_Empty");
 			this.events.addErrorsCount(flagId);
 			return defaultVariant;
 		}
 	}
 
-	getVariantKey(fsUser, flagId) {
+	getVariantKey(fsUser, flagId, defaultVariantKey) {
 		try {
 			if (this.lastUpdatedOn === 0)
 				throw new FlagsenseError('Loading data');
 			return this.userVariant.evaluate(fsUser.userId.toString(), fsUser.attributes, flagId).key;
 		}
 		catch (err) {
-			return '';
+			return defaultVariantKey || "FS_Empty";
 		}
 	}
 

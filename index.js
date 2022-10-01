@@ -23,6 +23,6 @@ exports.flag = function (flagId, defaultKey, defaultValue) {
 // waitForInitializationComplete()
 // waitForInitializationCompleteAsync()
 // getVariation(fsFlag, fsUser)
-// recordEvent(fsUser, flagId, eventName, value)
+// recordEvent(fsFlag, fsUser, eventName, value)
 // recordCodeError(fsFlag, fsUser)
 // setMaxInitializationWaitTime(timeInMillis)
