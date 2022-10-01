@@ -22,7 +22,7 @@
 		"lodash.clonedeep": "^4.5.0",
 		"murmurhash": "2.0.0",
 		"request": "2.88.2",
-		"requestretry": "5.0.0",
+		"requestretry": "7.1.0",
 		"uuid": "^8.3.2"
 	}
 }

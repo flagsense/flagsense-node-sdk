@@ -76,7 +76,7 @@ class Flagsense {
 		const variantKey = this.getVariantKey(fsUser, fsFlag.flagId, fsFlag.defaultKey);
 		if (variantKey === '')
 			return;
-		this.events.recordExperimentEvent(fsFlag.flagId, eventName, variantKey, value);
+		this.events.recordExperimentEvent(fsFlag.flagId, variantKey, eventName, value);
 	}
 
 	recordCodeError(fsFlag, fsUser) {
@@ -92,7 +92,7 @@ class Flagsense {
 		try {
 			if (this.lastUpdatedOn === 0)
 				throw new FlagsenseError('Loading data');
-			const variant = this.userVariant.evaluate(userId.toString(), attributes, flagId);
+			const variant = this.userVariant.evaluate(userId, attributes, flagId);
 			this.events.addEvaluationCount(flagId, variant.key);
 			return variant;
 		}
@@ -108,7 +108,7 @@ class Flagsense {
 		try {
 			if (this.lastUpdatedOn === 0)
 				throw new FlagsenseError('Loading data');
-			return this.userVariant.evaluate(fsUser.userId.toString(), fsUser.attributes, flagId).key;
+			return this.userVariant.evaluate(fsUser.userId, fsUser.attributes, flagId).key;
 		}
 		catch (err) {
 			return defaultVariantKey || "FS_Empty";

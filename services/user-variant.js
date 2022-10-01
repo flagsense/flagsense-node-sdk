@@ -20,7 +20,7 @@ class UserVariant {
 		if (!flag)
 			throw new FlagsenseError("Flag not found");
 
-		const userVariantKey = this.getUserVariantKey(userId, attributes, flag);
+		const userVariantKey = this.getUserVariantKey(userId.toString(), attributes, flag);
 		return {
 			key: userVariantKey,
 			value: flag.variants[userVariantKey].value
