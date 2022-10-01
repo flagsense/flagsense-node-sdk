@@ -109,7 +109,7 @@ class Events {
 		}
 	}
 
-	recordExperimentEvent(flagId, eventName, variantKey, value) {
+	recordExperimentEvent(flagId, variantKey, eventName, value) {
 		try {
 			if (!Constants.CAPTURE_EVENTS_FLAG)
 				return;
